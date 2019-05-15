@@ -5,11 +5,8 @@
 -->
 
 <template>
-  <!--<div id="login">
-
-      <h1> {{msg}}</h1>
-  </div>-->
   <el-form ref='AccountFrom' :model='account' :rules='rules' lable-position='left' lable-width='0px' class='demo-ruleForm login-container'>
+    <img src="../assets/logo.png">
     <h3 class="title">登录系统首页</h3>
     <el-form-item prop="username">
       <el-input type="text" v-model="account.username" auto-complete="off" placeholder="账号"></el-input>
@@ -65,16 +62,30 @@
             //将提交的数据进行封装
             var loginParams = {name : this.account.username,password:this.account.pwd};
 
+            //调用函数  传递参数 获取结果
+            requestLogin(loginParams).then(data=>{
 
-            axios.post('/user/login',qs.stringify(loginParams)).then(function (res) {
-              console.log(res);
-              alert(res)
-              if (res.data.code == '200') {
-                this.$router.push({path: '/hello'});
-              } else {
-                this.$router.push({path: '/home'});
+              this.logining = false;
+
+              if(data.code == '200'){
+                if(data.msg == 'admin') {
+                  //登录成功
+                  sessionStorage.setItem('access-token', data.token);
+                  //用vue路由跳转到后台主界面
+                  this.$router.push({path: '/admin'});
+                } else {
+                  sessionStorage.setItem('access-token', data.token);
+                  sessionStorage.setItem('id', data.id);
+                  //用vue路由跳转到后台主界面
+                  this.$router.push({path: '/my-exam'});
+                }
+              }else{
+                this.$message({
+                  message:data.msg,
+                  type:'error'
+                });
               }
-            });
+            })
 
           }else{
             console.log('error submit');

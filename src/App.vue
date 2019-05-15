@@ -1,13 +1,30 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
     <router-view/>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  provide() {
+    return {
+      reload: this.reload
+    }
+  },
+  data() {
+    return {
+      alive: true
+    }
+  },
+  methods: {
+    reload() {
+      this.alive= false
+      this.$nextTick(() => {
+        this.alive = true
+      })
+    }
+  }
 }
 </script>
 
