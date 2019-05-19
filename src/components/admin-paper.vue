@@ -29,10 +29,10 @@
       </el-header>
 
       <el-main>
-        <el-form ref='AccountFrom' lable-position='left' lable-width='10px' :inline="true"
-                 class='demo-ruleForm login-container'  style="text-align:left">
+        <el-form ref='AccountFrom' :inline="true"
+                 class='demo-ruleForm login-container'  style="position: relative;right: 550px;">
 
-          <el-form-item prop="model" style="width:10%;">
+          <el-form-item prop="model" style="width:50%;">
             <el-input type="text" v-model="modelId" auto-complete="off" placeholder="机型"></el-input>
           </el-form-item>
           <el-form-item style="width:10%;">
@@ -61,18 +61,18 @@
           </el-table-column>
         </el-table>
         <el-dialog
-          title="编辑考试"
+          title="编辑考卷"
           :visible.sync="dialogVisible"
           width="50%"
         >
-          <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                   class='demo-ruleForm login-container' style="text-align:center">
+          <el-form ref='AccountFrom' label-width="600"
+                   class='demo-ruleForm login-container' style="/* text-align: left; */position: relative;right: 120px;">
             <el-table :data="questionData">
               <el-table-column prop="id" label="id" width="140">
               </el-table-column>
               <el-table-column prop="questionType" label="类型" width="120">
               </el-table-column>
-              <el-table-column prop="questionstem" label="题目">
+              <el-table-column prop="questionstem" label="题目" >
               </el-table-column>
             </el-table>
             <el-form-item prop="modelId" >添加试题（逗号分隔）
@@ -105,7 +105,7 @@
           width="50%"
         >
           <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                   class='demo-ruleForm login-container' style="text-align:center">
+                   class='demo-ruleForm login-container' style="text-align:left">
             <el-form-item prop="modelId" >机型
               <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
             </el-form-item>
@@ -252,7 +252,7 @@
           }
         }).then((result) => {
           this.isDelete = false;
-          this.$router.push({path: '/admin'});
+          this.loadData();
         });
       },
       addPaper () {
@@ -263,7 +263,7 @@
             modelId:this.modelId,name:this.name,
           })}).then((result) => {
           this.addFlag = false;
-          this.$router.push({path: '/admin'});
+          this.loadData();
         });
       },
       deleteQuestion(rowData) {

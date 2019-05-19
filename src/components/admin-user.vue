@@ -17,6 +17,8 @@
         <el-submenu index="4" @click="adminUser()">
           <template slot="title"><i class="el-icon-setting"></i>用户管理</template>
           <el-menu-item index="4-1" @click="adminUser()">查询用户</el-menu-item>
+          <el-menu-item index="4-2" @click="addUser()">添加用户</el-menu-item>
+
         </el-submenu>
       </el-menu>
     </el-aside>
@@ -52,7 +54,7 @@
           width="50%"
         >
           <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                   class='demo-ruleForm login-container' style="text-align:center">
+                   class='demo-ruleForm login-container' style="text-align:left">
             <el-form-item style="width:100%;">
               <el-form-item prop="name" >名称:
                 <el-input type="text" v-model="name" style="width: 50%" auto-complete="off" :placeholder="name"></el-input>
@@ -87,12 +89,12 @@
           </el-form>
         </el-dialog>
         <el-dialog
-          title="添加考题"
+          title="添加用户"
           :visible.sync="addFlag"
           width="50%"
         >
           <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                   class='demo-ruleForm login-container' style="text-align:center">
+                   class='demo-ruleForm login-container' style="text-align:left">
             <el-form-item prop="name" >姓名:
               <el-input type="text" v-model="name" style="width: 50%" auto-complete="off" :placeholder="name"></el-input>
             </el-form-item>
@@ -230,7 +232,7 @@
           }
         }).then((result) => {
           this.isDelete = false;
-          this.$router.push({path: '/admin'});
+          this.loadData();
         });
       },
       addUser () {
@@ -244,7 +246,7 @@
             info : this.info,
           })}).then((result) => {
           this.addFlag = false;
-          this.$router.push({path: '/admin'});
+          this.loadData();
         });
       },
     }

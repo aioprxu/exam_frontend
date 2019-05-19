@@ -29,10 +29,10 @@
       </el-header>
 
       <el-main>
-        <el-form ref='AccountFrom' lable-position='left' lable-width='10px' :inline="true"
-                 class='demo-ruleForm login-container'  style="text-align:left">
+        <el-form ref='AccountFrom' :inline="true"
+                 class='demo-ruleForm login-container'  style="position: relative;right: 550px;">
 
-          <el-form-item prop="model" style="width:10%;">
+          <el-form-item prop="model" style="width:50%;">
             <el-input type="text" v-model="modelId" auto-complete="off" placeholder="机型"></el-input>
           </el-form-item>
           <el-form-item style="width:10%;">
@@ -68,7 +68,7 @@
           width="50%"
         >
           <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                   class='demo-ruleForm login-container' style="text-align:center">
+                   class='demo-ruleForm login-container' style="text-align:left">
             <el-form-item prop="modelId" >机型
               <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
             </el-form-item>
@@ -117,7 +117,7 @@
           width="50%"
         >
           <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                   class='demo-ruleForm login-container' style="text-align:center">
+                   class='demo-ruleForm login-container' style="text-align:left">
             <el-form-item prop="modelId" >机型
               <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
             </el-form-item>
@@ -277,7 +277,7 @@
           }
         }).then((result) => {
           this.isDelete = false;
-          this.$router.push({path: '/admin'});
+          this.loadData();
         });
       },
       addExam () {
@@ -287,12 +287,12 @@
         this.startTime = dateForm(this.startTime);
         this.stopTime = dateForm(this.stopTime);
         axios.post('/exam/add', {data:JSON.stringify({
-            examId:this.examId,modelId:this.modelId,name:this.name,
+            modelId:this.modelId,name:this.name,
             paperId:this.paperId,userId:this.userId,isOpen:this.isOpen,
             startTime:this.startTime,stopTime:this.stopTime
           })}).then((result) => {
           this.addFlag = false;
-          this.$router.push({path: '/admin'});
+          this.loadData();
         });
       },
       score (rowData) {

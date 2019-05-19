@@ -5,7 +5,6 @@
         <el-submenu index="1">
           <template slot="title"><i class="el-icon-setting"></i>考试管理</template>
           <el-menu-item index="/admin-exam" @click="adminExam()">查询考试</el-menu-item>
-          <el-menu-item index="1-2" @click="addUser()">添加考试</el-menu-item>
         </el-submenu>
         <el-submenu index="2">
           <template slot="title"><i class="el-icon-setting"></i>考题管理</template>
@@ -15,12 +14,10 @@
         <el-submenu index="3">
           <template slot="title"><i class="el-icon-setting"></i>考卷管理</template>
           <el-menu-item index="3-1" @click="adminPaper()">查询考卷</el-menu-item>
-          <el-menu-item index="3-2" @click="addUser()">添加考卷</el-menu-item>
         </el-submenu>
         <el-submenu index="4" @click="adminUser()">
           <template slot="title"><i class="el-icon-setting"></i>用户管理</template>
           <el-menu-item index="4-1" @click="adminUser()">查询用户</el-menu-item>
-          <el-menu-item index="4-2" @click="addUser()">添加用户</el-menu-item>
         </el-submenu>
       </el-menu>
     </el-aside>
@@ -32,10 +29,10 @@
       </el-header>
 
       <el-main>
-        <el-form ref='AccountFrom' lable-position='left' lable-width='10px' :inline="true"
-                 class='demo-ruleForm login-container'  style="text-align:left">
+        <el-form ref='AccountFrom' :inline="true"
+                 class='demo-ruleForm login-container'  style="position: relative;right: 550px;">
 
-          <el-form-item prop="model" style="width:10%;">
+          <el-form-item prop="model" style="width:50%;">
             <el-input type="text" v-model="modelId" auto-complete="off" placeholder="机型"></el-input>
           </el-form-item>
           <el-form-item style="width:10%;">
@@ -68,7 +65,7 @@
         width="50%"
       >
         <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                 class='demo-ruleForm login-container' style="text-align:center">
+                 class='demo-ruleForm login-container' style="text-align:left">
           <el-form-item prop="modelId" >机型
             <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
           </el-form-item>
@@ -108,7 +105,7 @@
         width="50%"
       >
         <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                 class='demo-ruleForm login-container' style="text-align:center">
+                 class='demo-ruleForm login-container' style="text-align:left">
           <el-form-item prop="modelId" >机型:
           <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
         </el-form-item>
@@ -287,7 +284,7 @@
           }
         }).then((result) => {
           this.isDelete = false;
-          this.$router.push({path: '/admin'});
+          this.loadData();
         });
       },
       addQuestion() {
@@ -302,7 +299,7 @@
             answer : this.answer
           })}).then((result) => {
           this.addFlag = false;
-          this.$router.push({path: '/admin'});
+          this.loadData();
         });
       }
     }

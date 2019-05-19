@@ -51,57 +51,29 @@
           :visible.sync="dialogVisible"
           width="50%"
         >
-          <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                   class='demo-ruleForm login-container' style="text-align:center">
-            <el-table :data="questionData">
-              <el-table-column prop="id" label="id" width="140">
+          <el-form ref='AccountFrom'
+                   class='demo-ruleForm login-container' style="position: relative;">
+            <el-table :data="answerData">
+              <el-table-column prop="title" label="问题" width="140">
               </el-table-column>
-              <el-table-column prop="questionType" label="类型" width="120">
+              <el-table-column prop="answer" label="答案" width="120">
               </el-table-column>
-              <el-table-column prop="questionstem" label="题目">
+              <el-table-column prop="score" label="分数" >
+              </el-table-column>
+              <el-table-column label="打分"  width="160">
+                <template slot-scope="scope">
+                  <el-form :model="scope.row" ref="scope.row" >
+                    <el-form-item prop="paramValue">
+                      <el-input v-show="true" size="small" v-model="scope.row.score" style="width:100px"></el-input>
+                    </el-form-item>
+                  </el-form>
+                </template>
               </el-table-column>
             </el-table>
-            <el-form-item prop="modelId" >添加试题（逗号分隔）
-              <el-input type="text" v-model="questionId" style="width: 50%" auto-complete="off" :placeholder="questionId"></el-input>
-            </el-form-item>
             <el-form-item style="width:100%;">
-              <el-button type="primary" @click='updatePaper'>确定
+              <el-button type="primary" @click='updateAnswer'>确定
               </el-button>
               <el-button type="primary" @click='dialogVisible = false'>取消
-              </el-button>
-            </el-form-item>
-          </el-form>      </el-dialog>
-        <el-dialog
-          title="是否删除"
-          :visible.sync="isDelete"
-          width="50%"
-        >
-          <el-form>
-            <el-form-item style="width:100%;">
-              <el-button type="primary" @click='ensureDeletePaper'>确定
-              </el-button>
-              <el-button type="primary" @click='isDelete = false'>取消
-              </el-button>
-            </el-form-item>
-          </el-form>
-        </el-dialog>
-        <el-dialog
-          title="添加考试"
-          :visible.sync="addFlag"
-          width="50%"
-        >
-          <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
-                   class='demo-ruleForm login-container' style="text-align:center">
-            <el-form-item prop="modelId" >机型
-              <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
-            </el-form-item>
-            <el-form-item prop="questionstem">名称
-              <el-input type="text" v-model="name" style="width: 50%" auto-complete="off" :placeholder="name"></el-input>
-            </el-form-item>
-            <el-form-item style="width:100%;">
-              <el-button type="primary" @click='ensureAddPaper'>确定
-              </el-button>
-              <el-button type="primary" @click='addFlag = false'>取消
               </el-button>
             </el-form-item>
           </el-form>      </el-dialog>
@@ -131,7 +103,7 @@
     data() {
       return {
         tableData:[],
-        questionData:[],
+        answerData:[],
         dialogVisible : false,
         isDelete : false,
         addFlag : false,
@@ -172,89 +144,23 @@
       logout() {
         this.$router.push({path: '/login'});
       },
-      searchPaper() {
-        axios.get('/paper/getByModel', {
-          params: {
-            model: this.modelId
-          }
-        }).then((result) => {
+      score(rowData) {
+        axios.get('/answer/get',{params:{examId:sessionStorage.getItem("examId"), userId:rowData.userId}}).then((result) => {
           console.log(result.data.data);
-          this.tableData = result.data.data;
-          console.log(this.tableData);
+          this.answerData = result.data.data;
+          this.dialogVisible = true;
+          console.log(this.answerData);
         });
-        this.$router.push({path: '/admin-paper'});
       },
-      editPaper(rowData) {
-        this.paperId = rowData.paperId;
-        axios.get('/question/getByPaper',{params:{paper: rowData.paperId}}).then((result) => {
-          console.log(result.data);
-          this.questionData = result.data.data;
-          this.questionData.forEach(item => {
-            item.questionType = this.convertType(item.questionType)
-          });
-          console.log(this.tableData);
-        });
-        this.dialogVisible = true;
-      },
-      convertType(questionType) {
-        switch (questionType) {
-          case 1://填空
-            return '填空题';
-            break;
-          case 5://简答
-            return '简答题';
-            break;
-          case 6://程序
-            return '程序题';
-            break;
-          case 2://选择
-            return '单选题';
-            break;
-          case 4://判断
-            return '判断题';
-            break;
-          case 3://多选
-            return '多选题';
-            break;
-        }
-      },
-      updatePaper () {
-        axios.post('/paper/update', {data:JSON.stringify({
-            paperId:this.paperId,
-            questionId : this.questionId
+      updateAnswer() {
+        console.log(this.answerData);
+        axios.post('/answer/update', {data:JSON.stringify({
+            answerList:this.answerData
           })}).then((result) => {
-        });
-        this.dialogVisible = false;
-      },
-      deletePaper (rowData) {
-        this.paperId = rowData.paperId;
-        this.isDelete = true;
-      },
-      ensureDeletePaper() {
-        axios.get('/paper/del', {
-          params: {
-            id: this.paperId
-          }
-        }).then((result) => {
-          this.isDelete = false;
-          this.$router.push({path: '/admin'});
+          this.dialogVisible = false;
+          this.loadData();
         });
       },
-      addPaper () {
-        this.addFlag = true;
-      },
-      ensureAddPaper() {
-        axios.post('/paper/add', {data:JSON.stringify({
-            modelId:this.modelId,name:this.name,
-          })}).then((result) => {
-          this.addFlag = false;
-          this.$router.push({path: '/admin'});
-        });
-      },
-      deleteQuestion(rowData) {
-        this.id = rowData.id;
-        this.isDelete = true;
-      }
     }
   }
 
