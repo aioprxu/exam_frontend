@@ -30,11 +30,16 @@
 
       <el-main>
         <el-form ref='AccountFrom' :inline="true"
-                 class='demo-ruleForm login-container'  style="position: relative;right: 550px;">
+                 class='demo-ruleForm login-container'  style="position: relative;right: 520px;">
 
-          <el-form-item prop="model" style="width:50%;">
-            <el-input type="text" v-model="modelId" auto-complete="off" placeholder="机型"></el-input>
-          </el-form-item>
+          <el-select v-model="value" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
           <el-form-item style="width:10%;">
             <el-button type="primary" style="width:100%;" @click='searchQuestion'>查询
             </el-button>
@@ -66,14 +71,21 @@
       >
         <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
                  class='demo-ruleForm login-container' style="text-align:left">
-          <el-form-item prop="modelId" >机型
-            <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
+          <el-form-item prop="modelId">机型
+            <el-select v-model="value" placeholder="请选择" style="width: 175px;">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
           <el-form-item prop="questionstem">题目
             <el-input type="text" v-model="questionstem" style="width: 50%" auto-complete="off" :placeholder="questionstem"></el-input>
           </el-form-item>
           <el-form-item prop="answer">选项
-            <el-input type="text" v-model="options" style="width: 50%" auto-complete="off" :placeholder="options"></el-input>
+            <el-input type="text" v-model="option" style="width: 50%" auto-complete="off" :placeholder="option"></el-input>
           </el-form-item>
           <el-form-item prop="answer">答案
             <el-input type="text" v-model="answer" style="width: 50%" auto-complete="off" :placeholder="answer"></el-input>
@@ -116,7 +128,7 @@
             <el-input type="text" v-model="questionType" style="width: 50%" auto-complete="off" :placeholder="questionType"></el-input>
           </el-form-item>
           <el-form-item prop="answer">选项:
-            <el-input type="text" v-model="options" style="width: 50%" auto-complete="off" :placeholder="options"></el-input>
+            <el-input type="text" v-model="option" style="width: 50%" auto-complete="off" :placeholder="option"></el-input>
           </el-form-item>
           <el-form-item prop="answer">答案:
             <el-input type="text" v-model="answer" style="width: 50%" auto-complete="off" :placeholder="answer"></el-input>
@@ -152,6 +164,26 @@
     name: 'admin-question',
     data() {
       return {
+        options:[{
+          value: '0',
+          label: '水陆两用飞机'
+        }, {
+          value: '1',
+          label: '喷气式飞机'
+        }, {
+          value: '2',
+          label: '水陆运输飞机'
+        }, {
+          value: '3',
+          label: '直升机'
+        }, {
+          value: '4',
+          label: '螺旋桨飞机'
+        }, {
+          value: '5',
+          label: '螺旋桨式喷气飞机'
+        }],
+        value:"",
         tableData:[],
         dialogVisible : false,
         isDelete : false,
@@ -161,7 +193,7 @@
         answer : "",
         id : 0,
         questionType : "",
-        options : "",
+        option : "",
         modelId : "",
       }
     },
@@ -244,17 +276,27 @@
       editQuestion(rowData) {
         this.dialogVisible = true;
         console.log(rowData);
-        this.modelId = rowData.modelId;
+        this.value = this.convertToModel(rowData.modelId);
         this.questionstem = rowData.questionstem;
         this.answer = rowData.answer;
         this.id = rowData.id;
         this.questionType = rowData.questionType;
-        this.options = rowData.options;
+        this.option = rowData.options;
+      },
+      convertToModel(modelId){
+        switch (modelId) {
+          case 0:return "水陆两用飞机";
+          case 1:return "喷气式飞机";
+          case 2:return "水陆运输飞机";
+          case 3:return "直升机";
+          case 4:return "螺旋桨飞机";
+          case 5:return "螺旋桨式喷气飞机";
+        }
       },
       searchQuestion() {
         axios.get('/question/getByModel', {
           params: {
-            model: this.modelId
+            model: this.value
           }
         }).then((result) => {
           console.log(result.data.data);
@@ -268,9 +310,10 @@
       },
       updateQuestion() {
         this.questionType = this.unConvertType(this.questionType);
-        axios.post('/question/update', {data:JSON.stringify({id:this.id,modelId:this.modelId,questionType:this.questionType,
-            questionstem:this.questionstem,options:this.options,answer:this.answer})}).then((result) => {
+        axios.post('/question/update', {data:JSON.stringify({id:this.id,modelId:this.value,questionType:this.questionType,
+            questionstem:this.questionstem,options:this.option,answer:this.answer})}).then((result) => {
         });
+        this.loadData();
         this.dialogVisible = false;
       },
       deleteQuestion(rowData) {
@@ -292,10 +335,10 @@
       },
       ensureAddQuestion() {
         axios.post('/question/add', {data:JSON.stringify({
-            modelId : this.modelId,
+            modelId : this.value,
             questionType : this.questionType,
             questionstem : this.questionstem,
-            options : this.options,
+            options : this.option,
             answer : this.answer
           })}).then((result) => {
           this.addFlag = false;

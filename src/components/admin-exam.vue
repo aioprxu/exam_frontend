@@ -30,11 +30,16 @@
 
       <el-main>
         <el-form ref='AccountFrom' :inline="true"
-                 class='demo-ruleForm login-container'  style="position: relative;right: 550px;">
+                 class='demo-ruleForm login-container'  style="position: relative;right: 520px;">
 
-          <el-form-item prop="model" style="width:50%;">
-            <el-input type="text" v-model="modelId" auto-complete="off" placeholder="机型"></el-input>
-          </el-form-item>
+          <el-select v-model="value" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
           <el-form-item style="width:10%;">
             <el-button type="primary" style="width:100%;" @click='searchExam'>查询
             </el-button>
@@ -70,7 +75,14 @@
           <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
                    class='demo-ruleForm login-container' style="text-align:left">
             <el-form-item prop="modelId" >机型
-              <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
+              <el-select v-model="value" placeholder="请选择" style="width: 175px;">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item prop="questionstem">姓名
               <el-input type="text" v-model="name" style="width: 50%" auto-complete="off" :placeholder="name"></el-input>
@@ -119,9 +131,16 @@
           <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
                    class='demo-ruleForm login-container' style="text-align:left">
             <el-form-item prop="modelId" >机型
-              <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
+              <el-select v-model="value" placeholder="请选择" style="width: 175px;">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item prop="questionstem">姓名
+            <el-form-item prop="name">姓名
               <el-input type="text" v-model="name" style="width: 50%" auto-complete="off" :placeholder="name"></el-input>
             </el-form-item>
             <el-form-item prop="answer">试卷
@@ -173,6 +192,26 @@
     name: 'admin-exam',
     data() {
       return {
+        options:[{
+          value: '0',
+          label: '水陆两用飞机'
+        }, {
+          value: '1',
+          label: '喷气式飞机'
+        }, {
+          value: '2',
+          label: '水陆运输飞机'
+        }, {
+          value: '3',
+          label: '直升机'
+        }, {
+          value: '4',
+          label: '螺旋桨飞机'
+        }, {
+          value: '5',
+          label: '螺旋桨式喷气飞机'
+        }],
+        value:"",
         tableData:[],
         dialogVisible : false,
         isDelete : false,
@@ -233,7 +272,7 @@
       searchExam() {
         axios.get('/exam/getByModel', {
           params: {
-            model: this.modelId
+            model: this.value
           }
         }).then((result) => {
           console.log(result.data.data);
@@ -246,9 +285,29 @@
         });
         this.$router.push({path: '/admin-exam'});
       },
+      convertToModelId(model){
+        switch (model) {
+          case "水陆两用飞机":return 0;
+          case "喷气式飞机":return 1;
+          case "水陆运输飞机":return 2;
+          case "直升机":return 3;
+          case "螺旋桨飞机":return 4;
+          case "螺旋桨式喷气飞机":return 5;
+        }
+      },
+      convertToModel(modelId){
+        switch (modelId) {
+          case 0:return "水陆两用飞机";
+          case 1:return "喷气式飞机";
+          case 2:return "水陆运输飞机";
+          case 3:return "直升机";
+          case 4:return "螺旋桨飞机";
+          case 5:return "螺旋桨式喷气飞机";
+        }
+      },
       editExam(rowData) {
         this.examId = rowData.examId;
-        this.modelId = rowData.modelId;
+        this.value = this.convertToModel(rowData.modelId);
         this.name = rowData.name;
         this.paperId = rowData.paperId;
         this.userId = rowData.userId;
@@ -260,10 +319,11 @@
       updateExam () {
         this.startTime = dateForm(this.startTime);
         this.stopTime = dateForm(this.stopTime);
-        axios.post('/exam/update', {data:JSON.stringify({examId:this.examId,modelId:this.modelId,name:this.name,
+        axios.post('/exam/update', {data:JSON.stringify({examId:this.examId,modelId:this.convertToModelId(this.value),name:this.name,
             paperId:this.paperId,userId:this.userId,isOpen:this.isOpen,
             startTime:this.startTime,stopTime:this.stopTime})}).then((result) => {
         });
+        this.loadData();
         this.dialogVisible = false;
       },
       deleteExam (rowData) {
@@ -287,7 +347,7 @@
         this.startTime = dateForm(this.startTime);
         this.stopTime = dateForm(this.stopTime);
         axios.post('/exam/add', {data:JSON.stringify({
-            modelId:this.modelId,name:this.name,
+            modelId:this.value,name:this.name,
             paperId:this.paperId,userId:this.userId,isOpen:this.isOpen,
             startTime:this.startTime,stopTime:this.stopTime
           })}).then((result) => {

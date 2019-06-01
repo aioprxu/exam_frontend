@@ -7,8 +7,7 @@
                  :router="true">
           <el-menu-item index="/my-exam">我的考试</el-menu-item>
           <el-menu-item index="/my-result">我的成绩</el-menu-item>
-          <el-menu-item @click="explain">成绩分析</el-menu-item>
-          <el-menu-item index="/" style="position: relative; left: 1100px">退出登陆</el-menu-item>
+          <el-menu-item index="/" style="position: relative; left: 1000px">退出登陆</el-menu-item>
         </el-menu>
       </el-col>
     </el-header>
@@ -63,7 +62,8 @@
 
 <script>
   import axios from 'axios';
-  import {formatDate} from "@/components/date";
+  import {dateForm, formatDate} from "@/components/date";
+  import { Message,MessageBox  } from 'element-ui';
 
   export default {
     name: 'my-exam',
@@ -95,9 +95,17 @@
       },
       startExam(rowData) {
         console.log(rowData.userId);
-        sessionStorage.setItem("userId",rowData.userId);
-        sessionStorage.setItem("examId",rowData.examId);
-        this.$router.push({path: '/exam'});
+        console.log(dateForm(rowData.startTime)+" "+Date.now()+" "+dateForm(rowData.stopTime));
+        if(dateForm(rowData.startTime) > Date.now() || dateForm(rowData.stopTime) < Date.now()) {
+          MessageBox("不在考试时间内", '提示', {
+                  confirmButtonText: '确定',
+                  type: 'error'
+          });
+        } else {
+          sessionStorage.setItem("userId", rowData.userId);
+          sessionStorage.setItem("examId", rowData.examId);
+          this.$router.push({path: '/exam'});
+        }
       },
       explain(){
 

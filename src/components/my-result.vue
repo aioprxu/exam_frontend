@@ -7,7 +7,6 @@
                  :router="true">
           <el-menu-item index="/my-exam">我的考试</el-menu-item>
           <el-menu-item index="/my-result">我的成绩</el-menu-item>
-          <el-menu-item index="/my-explain">成绩分析</el-menu-item>
           <el-menu-item index="/" style="position: relative; left: 1100px">退出登陆</el-menu-item>
         </el-menu>
       </el-col>

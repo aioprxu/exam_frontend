@@ -52,7 +52,7 @@
           width="50%"
         >
           <el-form ref='AccountFrom'
-                   class='demo-ruleForm login-container' style="position: relative;">
+                   class='demo-ruleForm' style="position: relative;">
             <el-table :data="answerData">
               <el-table-column prop="title" label="问题" width="140">
               </el-table-column>

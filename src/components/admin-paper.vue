@@ -30,11 +30,16 @@
 
       <el-main>
         <el-form ref='AccountFrom' :inline="true"
-                 class='demo-ruleForm login-container'  style="position: relative;right: 550px;">
+                 class='demo-ruleForm login-container'  style="position: relative;right: 520px;">
 
-          <el-form-item prop="model" style="width:50%;">
-            <el-input type="text" v-model="modelId" auto-complete="off" placeholder="机型"></el-input>
-          </el-form-item>
+            <el-select v-model="value" placeholder="请选择">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           <el-form-item style="width:10%;">
             <el-button type="primary" style="width:100%;" @click='searchPaper'>查询
             </el-button>
@@ -65,8 +70,8 @@
           :visible.sync="dialogVisible"
           width="50%"
         >
-          <el-form ref='AccountFrom' label-width="600"
-                   class='demo-ruleForm login-container' style="/* text-align: left; */position: relative;right: 120px;">
+          <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
+                   class='demo-ruleForm' style="text-align:center">
             <el-table :data="questionData">
               <el-table-column prop="id" label="id" width="140">
               </el-table-column>
@@ -100,14 +105,21 @@
           </el-form>
         </el-dialog>
         <el-dialog
-          title="添加考试"
+          title="添加考卷"
           :visible.sync="addFlag"
           width="50%"
         >
           <el-form ref='AccountFrom' lable-position='left' lable-width='10px'
                    class='demo-ruleForm login-container' style="text-align:left">
-            <el-form-item prop="modelId" >机型
-              <el-input type="text" v-model="modelId" style="width: 50%" auto-complete="off" :placeholder="modelId"></el-input>
+            <el-form-item prop="modelId">机型
+              <el-select v-model="value" placeholder="请选择" style="width: 175px;">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item prop="questionstem">名称
               <el-input type="text" v-model="name" style="width: 50%" auto-complete="off" :placeholder="name"></el-input>
@@ -144,6 +156,26 @@
     name: 'admin-paper',
     data() {
       return {
+        options:[{
+          value: '0',
+          label: '水陆两用飞机'
+        }, {
+          value: '1',
+          label: '喷气式飞机'
+        }, {
+          value: '2',
+          label: '水陆运输飞机'
+        }, {
+          value: '3',
+          label: '直升机'
+        }, {
+          value: '4',
+          label: '螺旋桨飞机'
+        }, {
+          value: '5',
+          label: '螺旋桨式喷气飞机'
+        }],
+        value:"",
         tableData:[],
         questionData:[],
         dialogVisible : false,
@@ -167,6 +199,9 @@
           console.log(result.data.data);
           this.tableData = result.data.data;
           console.log(this.tableData);
+          this.tableData.forEach(item => {
+            item.modelId = this.convertToModel(item.modelId)
+          });
         });
       },
       adminUser() {
@@ -190,12 +225,15 @@
       searchPaper() {
         axios.get('/paper/getByModel', {
           params: {
-            model: this.modelId
+            model: this.value
           }
         }).then((result) => {
           console.log(result.data.data);
           this.tableData = result.data.data;
           console.log(this.tableData);
+          this.tableData.forEach(item => {
+            item.modelId = this.convertToModel(item.modelId)
+          });
         });
         this.$router.push({path: '/admin-paper'});
       },
@@ -210,6 +248,16 @@
           console.log(this.tableData);
         });
         this.dialogVisible = true;
+      },
+      convertToModel(modelId){
+        switch (modelId) {
+          case 0:return "水陆两用飞机";
+          case 1:return "喷气式飞机";
+          case 2:return "水陆运输飞机";
+          case 3:return "直升机";
+          case 4:return "螺旋桨飞机";
+          case 5:return "螺旋桨式喷气飞机";
+        }
       },
       convertType(questionType) {
         switch (questionType) {
@@ -239,6 +287,7 @@
             questionId : this.questionId
             })}).then((result) => {
         });
+        this.loadData();
         this.dialogVisible = false;
       },
       deletePaper (rowData) {
@@ -260,7 +309,7 @@
       },
       ensureAddPaper() {
         axios.post('/paper/add', {data:JSON.stringify({
-            modelId:this.modelId,name:this.name,
+            modelId:this.value,name:this.name,
           })}).then((result) => {
           this.addFlag = false;
           this.loadData();
@@ -271,8 +320,7 @@
         this.isDelete = true;
       },
       toFile(rowData) {
-        axios.get('/paper/file',{params:{paperId:rowData.paperId}}).then((result) => {
-        });
+        window.location.href="http://localhost:8080/paper/download?paperId="+rowData.paperId
       }
     }
   }

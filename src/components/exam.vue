@@ -181,7 +181,9 @@
     },
     methods: {
       initExam() {
-        // let that = this;
+        console.log("dafaefef")
+        console.log(this.questionList)
+        let that = this;
         // window.onblur = function () {
         //   that.onblurTime++;
         //   if (that.onblurTime == 2) {
@@ -209,11 +211,10 @@
 
           if (this.hour == 0 && this.min == 0) {
             window.clearInterval(this.timer);
-            this.submitPaper();
+            this.submitPaper;
           }
 
         }, 1000);
-        console.log("11111111111111111111111111111111");
         console.log(sessionStorage.getItem("userId"));
         this.currentQuestion = this.questionList[this.questionId-1];
         console.log(this.currentQuestion);
@@ -222,7 +223,7 @@
         console.log(this.questionList);
         console.log("route");
         window.onblur = null;
-        // this.saveAnswer(false);
+        // this.saveAnswer();
         let answer = {};
         for (let i = 0; i < this.questionList.length; i++) {
 
@@ -265,11 +266,11 @@
           examId : sessionStorage.getItem("examId")
         })})
           .then((res) => {
-            if (res.data.respCode == '200') {
+            if (flag == true && res.data.respCode == '200') {
               this.$router.push(`/my-exam`);
             }
           });
-        this.$router.push({path: '/my-exam'});
+
       },
       clickAnswerCard(index) {
         console.log("aaaaaaaaaaaaaaaaaaaaa"+index);
@@ -283,7 +284,6 @@
       },
       saveAnswer(type) {
         let questionId = this.questionId;
-        console.log("qqqqqqqqqqqqqqqqq"+ questionId + "   "+ this.radio + this.textarea);
 
         let answer = '';
         switch (this.questionType) {
@@ -311,6 +311,11 @@
         }
 
         this.questionList[questionId-1].answer = answer;
+        axios.post("/exam/saveCache", {data:JSON.stringify({
+            examId:sessionStorage.getItem("examId"),
+            userId:sessionStorage.getItem("userId"),
+            answer : this.questionList,
+          })})
       },
       nextQuestion() {
         this.saveAnswer(true);
@@ -325,6 +330,8 @@
         this.questionId = this.questionId+1;
         this.currentQuestion = this.questionList[this.questionId-1];
         this.questionType = this.currentQuestion.questionType;
+        this.radio = this.questionList[this.questionId - 1].answer;
+        this.textarea = this.questionList[this.questionId - 1].answer;
         this.$router.push({path: '/exam'});
       },
       setAnswer(questionType, answer) {
@@ -355,10 +362,16 @@
             this.questionList = respData.questionRspList;
             this.startTime = respData.startTime;
             this.endTime = respData.stopTime;
-
+            axios.get('/exam/getCache',{params:{examId:sessionStorage.getItem("examId"), userId:sessionStorage.getItem("userId")}}).then((result) => {
+              console.log(result.data.data);
+              this.questionList = JSON.parse(result.data.data) ;
+              this.radio = this.questionList[this.questionId - 1].answer;
+              this.textarea = this.questionList[this.questionId - 1].answer;
+              console.log("=================")
+              console.log(this.questionList)
+            });
             this.initExam();
-          })
-
+          });
       }
     },
 
